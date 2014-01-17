@@ -1,7 +1,7 @@
 #!/bin/bash
 
 export PACKAGE="beast"
-export VERSION="1.7.5"
+export VERSION="1.8.0"
 
 export TARGET_MACHINE="gordon"
 
@@ -26,7 +26,7 @@ module purge
 module load gnubase
 module load intel
 
-svn co http://beast-mcmc.googlecode.com/svn/tags/beast_release_1_7_5/ ${SRCDIR}
+svn co http://beast-mcmc.googlecode.com/svn/tags/beast_release_1_8_0/ ${SRCDIR}
 
 #fix wrong indentation in makefiles, Make REQUIRES TAB characters
 (cd ${SRCDIR}/native; for onemkfile in Makefile*; do unexpand ${onemkfile} > ${onemkfile}.unexpanded; done )
@@ -36,13 +36,14 @@ svn co http://beast-mcmc.googlecode.com/svn/tags/beast_release_1_7_5/ ${SRCDIR}
 
 
 #patch the script file to put BEAGLE_LIB on the java.library.path
-patch -N ${SRCDIR}/release/Linux/scripts/beast << EOF
+patch ${SRCDIR}/release/Linux/scripts/beast << EOF
 26c26,27
-< java -Xms64m -Xmx1024m -Djava.library.path="\$BEAST_LIB:/usr/local/lib" -cp "\$BEAST_LIB/beast.jar:\$BEAST_LIB/beast-beagle.jar" dr.app.beast.BeastMain \$*
+< java -Xms64m -Xmx2048m -Djava.library.path="\$BEAST_LIB:/usr/local/lib" -cp "\$BEAST_LIB/beast.jar:\$BEAST_LIB/beast-beagle.jar" dr.app.beast.BeastMain \$*
 ---
 > BEAGLE_LIB="\$BEAGLE_HOME/lib"
-> java -Xms64m -Xmx1024m -Djava.library.path="\$BEAGLE_LIB:\$BEAST_LIB:/usr/local/lib" -cp "\$BEAST_LIB/beast.jar:\$BEAST_LIB/beast-beagle.jar" dr.app.beast.BeastMain \$*
+> java -Xms64m -Xmx2048m -Djava.library.path="\$BEAGLE_LIB:\$BEAST_LIB:/usr/local/lib" -cp "\$BEAST_LIB/beast.jar:\$BEAST_LIB/beast-beagle.jar" dr.app.beast.BeastMain \$*
 EOF
+
 
 
 #build java

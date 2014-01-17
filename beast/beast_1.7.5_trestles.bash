@@ -3,7 +3,7 @@
 export PACKAGE="beast"
 export VERSION="1.7.5"
 
-export TARGET_MACHINE="gordon"
+export TARGET_MACHINE="trestles"
 
 export BASE_PREFIX="/home/blunt/opt"
 export BASE_MODULE_PREFIX="/home/blunt/.privatemodules/${TARGET_MACHINE}"
@@ -11,7 +11,7 @@ export BASE_MODULE_PREFIX="/home/blunt/.privatemodules/${TARGET_MACHINE}"
 
 
 #later on, choose the compiler based on the target machine, user can override.
-export COMPILER="intel"
+export COMPILER="gnu"
 
 
 export INSTALL_PREFIX="${BASE_PREFIX}/${TARGET_MACHINE}/${PACKAGE}/${VERSION}"
@@ -24,7 +24,7 @@ export SRCDIR=${PACKAGE}_${VERSION}_${TARGET_MACHINE}_src
 
 module purge
 module load gnubase
-module load intel
+module load gnu
 
 svn co http://beast-mcmc.googlecode.com/svn/tags/beast_release_1_7_5/ ${SRCDIR}
 
@@ -32,7 +32,7 @@ svn co http://beast-mcmc.googlecode.com/svn/tags/beast_release_1_7_5/ ${SRCDIR}
 (cd ${SRCDIR}/native; for onemkfile in Makefile*; do unexpand ${onemkfile} > ${onemkfile}.unexpanded; done )
 
 #build native
-(cd ${SRCDIR}/native; rm -f *.so *.o; make -f Makefile.icc.unexpanded;)
+(cd ${SRCDIR}/native; rm -f *.so *.o; make -f Makefile.amd64.unexpanded;)
 
 
 #patch the script file to put BEAGLE_LIB on the java.library.path

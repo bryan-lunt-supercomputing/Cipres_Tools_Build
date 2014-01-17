@@ -1,7 +1,7 @@
 #!/bin/bash
 
 export PACKAGE="beast"
-export VERSION="1.8"
+export VERSION="1.8.0"
 
 export TARGET_MACHINE="trestles"
 
@@ -53,7 +53,7 @@ EOF
 
 ### INSTALL ###
 mkdir -p ${INSTALL_PREFIX}
-cp -r ${SRCDIR}/release/Linux/BEASTv1.8.0/* ${INSTALL_PREFIX}
+cp -r ${SRCDIR}/release/Linux/BEASTv${VERSION}/* ${INSTALL_PREFIX}
 
 #######################
 ### Create a Module File ###
