@@ -4,17 +4,17 @@
 ### BASIC SETTINGS ###
 
 
-export PACKAGE="phylobayes"
-export VERSION="1.5a"
+export PACKAGE="beagle"
+export VERSION="2.0"
 
-export TARGET_MACHINE="gordon"
+export TARGET_MACHINE="trestles"
 
 export BASE_PREFIX="/home/blunt/opt/${TARGET_MACHINE}"
 export BASE_MODULE_PREFIX="/home/blunt/.privatemodules/${TARGET_MACHINE}"
 
 #later on, choose the compiler based on the target machine, user can override.
-export COMPILER="intel"
-export PREREQ_MODULES="openmpi_ib"
+export COMPILER="gnu"
+export PREREQ_MODULES=""
 
 export INSTALL_PREFIX="${BASE_PREFIX}/${PACKAGE}/${VERSION}"
 
@@ -29,6 +29,17 @@ function compilation_step () {
 #The user must fetch the sourcecode into SRCDIR
 #The user may update SRCDIR to some subdirectory of the original SRCDIR if that is conveninent.
 
+export LC_ALL="en_US"
+
+svn checkout http://beagle-lib.googlecode.com/svn/tags/beagle_release_2_0/ ${SRCDIR}
+
+(cd ${SRCDIR} ; ./autogen.sh; )
+
+export CFLAGS='-I/opt/gnu/include'
+export CXXFLAGS='-I/opt/gnu/include'
+
+(cd ${SRCDIR} ; ./configure --prefix=${INSTALL_PREFIX} --libdir=${INSTALL_PREFIX}/lib --enable-sse=yes --enable-openmp=no)
+(cd ${SRCDIR} ; make )
 
 
 #The program should be compiled by the end.
@@ -38,7 +49,8 @@ function compilation_step () {
 #Install everyting into ${INSTALL_PREFIX}
 #${INSTALL_PREFIX} can be assumed to exist
 function install_step () {
-cp -r ${SRCDIR}/bin ${INSTALL_PREFIX}
+
+(cd ${SRCDIR}; make install )
 
 }
 
@@ -66,9 +78,9 @@ module-whatis   "Compiler: ${COMPILER}"
 prereq ${COMPILER} ${PREREQ_MODULES}
 # for Tcl script use only
 set     version          ${VERSION}
-set     phylobayeshome   ${INSTALL_PREFIX}
-setenv  PHYLOBAYES_HOME  \$phylobayeshome
-append-path     PATH     \$phylobayeshome/bin
+set     beaglehome    ${INSTALL_PREFIX}
+setenv  BEAGLE_HOME  \$beaglehome
+setenv  BEAGLE_LIB   \$beaglehome/lib
 EOF
 }
 
