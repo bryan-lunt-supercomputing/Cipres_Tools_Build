@@ -92,7 +92,7 @@ module-whatis   "Compiler: ${COMPILER}"
 prereq intel openmpi_ib
 # for Tcl script use only
 set     version          ${VERSION}
-set     \$phylobayeshome ${INSTALL_PREFIX}
+set     phylobayeshome ${INSTALL_PREFIX}
 setenv  PHYLOBAYES_HOME  \$phylobayeshome
 append-path     PATH     \$phylobayeshome/bin
 EOF
