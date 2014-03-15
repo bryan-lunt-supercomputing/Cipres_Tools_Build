@@ -4,8 +4,8 @@
 ### BASIC SETTINGS ###
 
 
-export PACKAGE="beagle"
-export VERSION="2.0"
+export PACKAGE="fasttree"
+export VERSION="2.1.7"
 
 export TARGET_MACHINE="trestles"
 
@@ -28,18 +28,18 @@ export INSTALL_PREFIX="${BASE_PREFIX}/${PACKAGE}/${VERSION}"
 function compilation_step () {
 #The user must fetch the sourcecode into SRCDIR
 #The user may update SRCDIR to some subdirectory of the original SRCDIR if that is conveninent.
+SRCURL="http://meta.microbesonline.org/fasttree/FastTree-${VERSION}.c"
+curl ${SRCURL} > ${SRCDIR}/FastTree.c
+curl "http://meta.microbesonline.org/fasttree/ChangeLog" > ${SRCDIR}/ChangeLog.txt 
+mkdir -p ${SRCDIR}/bin
 
-export LC_ALL="en_US"
+CC="gcc"
+CFLAGS="-lm -DOPENMP -fopenmp -O3 -finline-functions -funroll-loops -Wall"
 
-svn checkout http://beagle-lib.googlecode.com/svn/tags/beagle_release_2_0/ ${SRCDIR}
+BINARY="FastTreeMP"
 
-(cd ${SRCDIR} ; ./autogen.sh; )
+(cd ${SRCDIR}; ${CC} ${CFLAGS} -o bin/FastTreeMP FastTree.c)
 
-export CFLAGS='-I/opt/gnu/include'
-export CXXFLAGS='-I/opt/gnu/include'
-
-(cd ${SRCDIR} ; ./configure --prefix=${INSTALL_PREFIX} --libdir=${INSTALL_PREFIX}/lib --enable-sse=yes --enable-openmp=no)
-(cd ${SRCDIR} ; make )
 
 
 #The program should be compiled by the end.
@@ -49,8 +49,7 @@ export CXXFLAGS='-I/opt/gnu/include'
 #Install everyting into ${INSTALL_PREFIX}
 #${INSTALL_PREFIX} can be assumed to exist
 function install_step () {
-
-(cd ${SRCDIR}; make install )
+cp -r ${SRCDIR}/bin ${INSTALL_PREFIX}
 
 }
 
@@ -75,13 +74,10 @@ module-whatis   "${PACKAGE}"
 module-whatis   "Version: ${VERSION}"
 module-whatis   "Description: ${PACKAGE}"
 module-whatis   "Compiler: ${COMPILER}"
-prereq ${COMPILER} ${PREREQ_MODULES}
+prereq ${PREREQ_MODULES}
 # for Tcl script use only
 set     version          ${VERSION}
-set     beaglehome    ${INSTALL_PREFIX}
-setenv  BEAGLE_HOME  \$beaglehome
-setenv  BEAGLE_LIB   \$beaglehome/lib
-append-path LD_LIBRARY_PATH \$beaglehome/lib
+append-path     PATH     ${INSTALL_PREFIX}/bin
 EOF
 }
 

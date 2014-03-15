@@ -4,8 +4,8 @@
 ### BASIC SETTINGS ###
 
 
-export PACKAGE="beagle"
-export VERSION="2.0"
+export PACKAGE="garli"
+export VERSION="2.01"
 
 export TARGET_MACHINE="trestles"
 
@@ -14,7 +14,7 @@ export BASE_MODULE_PREFIX="/home/blunt/.privatemodules/${TARGET_MACHINE}"
 
 #later on, choose the compiler based on the target machine, user can override.
 export COMPILER="gnu"
-export PREREQ_MODULES=""
+export PREREQ_MODULES="openmpi_ib"
 
 export INSTALL_PREFIX="${BASE_PREFIX}/${PACKAGE}/${VERSION}"
 
@@ -29,17 +29,15 @@ function compilation_step () {
 #The user must fetch the sourcecode into SRCDIR
 #The user may update SRCDIR to some subdirectory of the original SRCDIR if that is conveninent.
 
-export LC_ALL="en_US"
+#Checkout the code
+svn checkout http://garli.googlecode.com/svn/garli/tags/2.01-release/ ${SRCDIR}
 
-svn checkout http://beagle-lib.googlecode.com/svn/tags/beagle_release_2_0/ ${SRCDIR}
+#Prepare NCL, we are actually going to link it statically...
+(cd ${SRCDIR}; svn checkout http://svn.code.sf.net/p/ncl/code/branches/v2.1/ ncl-svn;)
+(cd ${SRCDIR}/ncl-svn; ./bootstrap.sh ; automake --add-missing; ./bootstrap.sh; ./configure --prefix=${PWD}  --with-constfuncs=yes --disable-shared --enable-static; make; make install; )
 
-(cd ${SRCDIR} ; ./autogen.sh; )
-
-export CFLAGS='-I/opt/gnu/include'
-export CXXFLAGS='-I/opt/gnu/include'
-
-(cd ${SRCDIR} ; ./configure --prefix=${INSTALL_PREFIX} --libdir=${INSTALL_PREFIX}/lib --enable-sse=yes --enable-openmp=no)
-(cd ${SRCDIR} ; make )
+#build GARLI itself.
+(cd ${SRCDIR}; ./bootstrap.sh; automake --add-missing; ./bootstrap.sh; CC='mpicc' CXX='mpic++' ./configure --with-ncl=$PWD/ncl-svn --prefix=${INSTALL_PREFIX} --enable-mpi; make;)
 
 
 #The program should be compiled by the end.
@@ -50,7 +48,7 @@ export CXXFLAGS='-I/opt/gnu/include'
 #${INSTALL_PREFIX} can be assumed to exist
 function install_step () {
 
-(cd ${SRCDIR}; make install )
+(cd ${SRCDIR}; make install;)
 
 }
 
@@ -78,10 +76,9 @@ module-whatis   "Compiler: ${COMPILER}"
 prereq ${COMPILER} ${PREREQ_MODULES}
 # for Tcl script use only
 set     version          ${VERSION}
-set     beaglehome    ${INSTALL_PREFIX}
-setenv  BEAGLE_HOME  \$beaglehome
-setenv  BEAGLE_LIB   \$beaglehome/lib
-append-path LD_LIBRARY_PATH \$beaglehome/lib
+set     garlihome   ${INSTALL_PREFIX}
+setenv  GARLI_HOME  \$garlihome
+append-path     PATH     \$garlihome/bin
 EOF
 }
 

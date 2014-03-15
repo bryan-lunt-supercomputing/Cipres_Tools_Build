@@ -13,7 +13,7 @@ export BASE_PREFIX="/home/blunt/opt/${TARGET_MACHINE}"
 export BASE_MODULE_PREFIX="/home/blunt/.privatemodules/${TARGET_MACHINE}"
 
 #later on, choose the compiler based on the target machine, user can override.
-export COMPILER="intel"
+export COMPILER="gnu"
 export PREREQ_MODULES=""
 
 export INSTALL_PREFIX="${BASE_PREFIX}/${PACKAGE}/${VERSION}"
@@ -33,10 +33,10 @@ export LC_ALL="en_US"
 
 svn checkout http://beagle-lib.googlecode.com/svn/tags/beagle_release_2_1/ ${SRCDIR}
 
-
-export CC=icc
-export CXX=icpc
+export CC=gcc
+export CXX=g++
 #export CFLAGS='-I/opt/gnu/include'
+export CPPFLAGS='-I/opt/gnu/include'
 #export CXXFLAGS='-I/opt/gnu/include'
 
 (cd ${SRCDIR} ; ./autogen.sh; )
@@ -84,6 +84,7 @@ set     version          ${VERSION}
 set     beaglehome    ${INSTALL_PREFIX}
 setenv  BEAGLE_HOME  \$beaglehome
 setenv  BEAGLE_LIB   \$beaglehome/lib
+append-path LD_LIBRARY_PATH \$beaglehome/lib
 EOF
 }
 

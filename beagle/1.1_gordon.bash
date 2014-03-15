@@ -177,6 +177,7 @@ set     version          ${VERSION}
 set     beaglehome   ${INSTALL_PREFIX}
 setenv  BEAGLE_HOME  \$beaglehome
 setenv  BEAGLE_LIB   \$beaglehome/lib
+append-path LD_LIBRARY_PATH \$beaglehome/lib
 EOF
 }
 

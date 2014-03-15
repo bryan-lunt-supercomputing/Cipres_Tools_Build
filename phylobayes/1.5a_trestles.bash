@@ -4,8 +4,8 @@
 ### BASIC SETTINGS ###
 
 
-export PACKAGE="beagle"
-export VERSION="2.0"
+export PACKAGE="phylobayes"
+export VERSION="1.5a"
 
 export TARGET_MACHINE="trestles"
 
@@ -14,7 +14,7 @@ export BASE_MODULE_PREFIX="/home/blunt/.privatemodules/${TARGET_MACHINE}"
 
 #later on, choose the compiler based on the target machine, user can override.
 export COMPILER="gnu"
-export PREREQ_MODULES=""
+export PREREQ_MODULES="openmpi_ib"
 
 export INSTALL_PREFIX="${BASE_PREFIX}/${PACKAGE}/${VERSION}"
 
@@ -29,17 +29,31 @@ function compilation_step () {
 #The user must fetch the sourcecode into SRCDIR
 #The user may update SRCDIR to some subdirectory of the original SRCDIR if that is conveninent.
 
-export LC_ALL="en_US"
+#Get the sourcecode
+(cd ${SRCDIR}; wget http://megasun.bch.umontreal.ca/People/lartillot/www/pb_mpi1.5a.tar.gz; tar -zxvof pb_mpi1.5a.tar.gz; )
+export SRCDIR=${SRCDIR}/pb_mpi1.5a
 
-svn checkout http://beagle-lib.googlecode.com/svn/tags/beagle_release_2_0/ ${SRCDIR}
+#get the license
+(cd ${SRCDIR}; wget http://www.gnu.org/licenses/gpl.txt; )
 
-(cd ${SRCDIR} ; ./autogen.sh; )
+#patch the Makefile
+(cd ${SRCDIR};
+patch -N  sources/Makefile <<<'
+@@ -41,7 +41,7 @@ OBJS=$(patsubst %.cpp,%.o,$(SRCS))
+ ALL_SRCS=$(wildcard *.cpp)
+ ALL_OBJS=$(patsubst %.cpp,%.o,$(ALL_SRCS))
+ 
+-PROGSDIR=../data
++PROGSDIR=../bin
+ ALL= pb_mpi readpb_mpi tracecomp bpcomp bpcomp2
+ PROGS=$(addprefix $(PROGSDIR)/, $(ALL))
+ 
+';
+)
 
-export CFLAGS='-I/opt/gnu/include'
-export CXXFLAGS='-I/opt/gnu/include'
+#build
+(cd ${SRCDIR}; mkdir -p bin; rm -f bin/*; make -C sources clean all; )
 
-(cd ${SRCDIR} ; ./configure --prefix=${INSTALL_PREFIX} --libdir=${INSTALL_PREFIX}/lib --enable-sse=yes --enable-openmp=no)
-(cd ${SRCDIR} ; make )
 
 
 #The program should be compiled by the end.
@@ -49,8 +63,8 @@ export CXXFLAGS='-I/opt/gnu/include'
 #Install everyting into ${INSTALL_PREFIX}
 #${INSTALL_PREFIX} can be assumed to exist
 function install_step () {
-
-(cd ${SRCDIR}; make install )
+cp -r ${SRCDIR}/bin ${INSTALL_PREFIX}
+cp -r ${SRCDIR}/gpl.txt ${INSTALL_PREFIX}
 
 }
 
@@ -78,10 +92,9 @@ module-whatis   "Compiler: ${COMPILER}"
 prereq ${COMPILER} ${PREREQ_MODULES}
 # for Tcl script use only
 set     version          ${VERSION}
-set     beaglehome    ${INSTALL_PREFIX}
-setenv  BEAGLE_HOME  \$beaglehome
-setenv  BEAGLE_LIB   \$beaglehome/lib
-append-path LD_LIBRARY_PATH \$beaglehome/lib
+set     phylobayeshome   ${INSTALL_PREFIX}
+setenv  PHYLOBAYES_HOME  \$phylobayeshome
+append-path     PATH     \$phylobayeshome/bin
 EOF
 }
 
