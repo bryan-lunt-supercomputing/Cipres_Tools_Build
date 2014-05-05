@@ -8,9 +8,9 @@
 	</xsl:copy>
 </xsl:template>
 
-<xsl:template match="distribution[@spec='TreeLikelihood']/@spec">
+<xsl:template match="distribution[@spec='TreeLikelihood' or @spec='likelihood.TreeLikelihood' or @spec='evolution.likelihood.TreeLikelihood' or @spec='beast.evolution.likelihood.TreeLikelihood']/@spec">
 	<xsl:attribute name="spec">
-		<xsl:value-of select="'ThreadedTreeLikelihood'"/>
+		<xsl:value-of select="'beast.evolution.likelihood.ThreadedTreeLikelihood'"/>
 	</xsl:attribute>
 </xsl:template>
 
@@ -24,7 +24,7 @@
 
 <!-- You can just replace the content of this template with the appropriate script to run ParticleFilter -->
 <!-- See http://www.beast2.org/wiki/index.php/Performance_Suggestions#Particle_Filter -->
-<xsl:template match="run[@spec='beast.inference.ParticleFilter']/text()">
+<xsl:template match="run[@spec='ParticleFilter' or @spec='inference.ParticleFilter' or @spec='beast.inference.ParticleFilter']/text()">
 	<contact-CIPRES-admins-if-you-absolutely-need-particlefilter>
 	Please do not use ParticleFilter on CIPRES.
 	Contact CIPRES administrators if this is absolutely necessary for your science.
