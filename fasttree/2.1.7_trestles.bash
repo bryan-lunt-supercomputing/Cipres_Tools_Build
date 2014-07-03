@@ -9,8 +9,8 @@ export VERSION="2.1.7"
 
 export TARGET_MACHINE="trestles"
 
-export BASE_PREFIX="/home/blunt/opt/${TARGET_MACHINE}"
-export BASE_MODULE_PREFIX="/home/blunt/.privatemodules/${TARGET_MACHINE}"
+export BASE_PREFIX="/projects/ps-ngbt/opt/${TARGET_MACHINE}"
+export BASE_MODULE_PREFIX="/projects/ps-ngbt/opt/modules/${TARGET_MACHINE}"
 
 #later on, choose the compiler based on the target machine, user can override.
 export COMPILER="gnu"
@@ -36,11 +36,11 @@ mkdir -p ${SRCDIR}/bin
 CC="gcc"
 CFLAGS="-lm -DOPENMP -fopenmp -O3 -finline-functions -funroll-loops -Wall"
 
-BINARY="FastTreeMP"
+(cd ${SRCDIR}; ${CC} ${CFLAGS} -o bin/fasttree FastTree.c)
 
-(cd ${SRCDIR}; ${CC} ${CFLAGS} -o bin/FastTreeMP FastTree.c)
+CFLAGS="-lm -DOPENMP -fopenmp -O3 -finline-functions -funroll-loops -Wall -DUSE_DOUBLE"
 
-
+(cd ${SRCDIR}; ${CC} ${CFLAGS} -o bin/fasttree_double FastTree.c)
 
 #The program should be compiled by the end.
 }
